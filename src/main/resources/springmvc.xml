@@ -1,0 +1,48 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
+    <!--配置表单数据验证器-->
+    <bean id="accountValidator" class="com.xu.validator.AccountValidator"></bean>
+    <mvc:annotation-driven validator="accountValidator"></mvc:annotation-driven>
+    <!--配置上传组件-->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver"></bean>
+
+    <context:component-scan base-package="com.xu"></context:component-scan>
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/"></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+
+    <bean id="conversionService"
+          class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <property name="converters">
+            <list>
+                <bean class="com.xu.converter.DateConverter">
+                    <constructor-arg type="java.lang.String" value="yyyy-MM-dd"></constructor-arg>
+                    <!--这里有参构造是给DateConverter的有参构造传"yyyy-MM-dd"的日期格式-->
+                </bean>
+                <bean class="com.xu.converter.UserConverter"></bean>
+            </list>
+        </property>
+    </bean>
+    <!--conversion-service="conversionService" 注册一个转化器 -->
+    <mvc:annotation-driven conversion-service="conversionService" >
+        <!--消息转换器，解决消息编码乱码-->
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes" value="text/html;charset=utf-8"/>
+            </bean>
+            <!--配置fastjson-->
+            <bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4"/>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <mvc:annotation-driven/>
+</beans>
